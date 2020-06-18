@@ -2,3 +2,4 @@ yarn|https://dl.yarnpkg.com/debian/pubkey.gpg|https://dl.yarnpkg.com/debian|stab
 brave-browser|https://brave-browser-apt-release.s3.brave.com/brave-core.asc|https://brave-browser-apt-release.s3.brave.com|stable|main
 docker|https://download.docker.com/linux/ubuntu/gpg|https://download.docker.com/linux/ubuntu|focal|stable
 vscode|https://packages.microsoft.com/keys/microsoft.asc|https://packages.microsoft.com/repos/vscode|stable|main
+spotify|https://download.spotify.com/debian/pubkey.gpg|http://repository.spotify.com|stable|non-free
