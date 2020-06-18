@@ -1,0 +1,2 @@
+ppa:papirus/papirus
+ppa:lazygit-team/release
