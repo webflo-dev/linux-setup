@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare gpg=/home/florent/florent.gpg;
+declare gpg=$homedir/florent.gpg;
 
 if [ -d $gpg ] then;
     kleopatra -i $gpg;

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare tmp_file = 'jkjhkghrkghegkhj-omz.sh' 
+declare tmp_file = $tempdir/jkjhkghrkghegkhj-omz.sh; 
 
 wget -O $tmp_file  https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh;
 ZSH=~/.oh-my-zsh RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh install.sh;
