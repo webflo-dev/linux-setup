@@ -11,9 +11,9 @@ fi
 
 declare target=$bindir/$asset_name;
 
-curl -s https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest \
+url=$(curl -s https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest \
 | grep "browser_download_url.*linux-x86_64" \
-| cut -d '"' -f 4 \
-| wget -O $target -i -;
+| cut -d '"' -f 4);
 
+downloaded_file $url $target;
 chmod +x $target;
