@@ -2,6 +2,6 @@
 
 declare gpg=$homedir/florent.gpg;
 
-if [ -d $gpg ] then;
+if [ -d $gpg ]; then
     kleopatra -i $gpg;
 fi
