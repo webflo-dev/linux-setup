@@ -122,10 +122,6 @@ aptx() {
   apt -y -qq $@
 }
 
-aptx() {
-  apt -y -qq $@
-}
-
 add_apt_key() {
   curl -sSL $2 | apt-key add -
   echo "deb [arch=amd64] $3 $4 $5" | tee /etc/apt/sources.list.d/$1.list
@@ -187,11 +183,6 @@ parse_commandline "$@"
 declare -A settings
 parse_ini ./setup.ini settings $_arg_app
 
-echo ${GREEN}"===== Updating system"${RESET}
-aptx update && aptx full-upgrade && aptx autoremove
-
-if ([ $_arg_init == 'on' ]); then install_prerequisites; fi
-
 declare workdir=$(pwd)
 declare tempdir=$workdir/temporary_files
 declare stepdir=$workdir/steps
@@ -200,6 +191,12 @@ declare appsdir=$workdir/applications
 declare bindir=$homedir/bin
 
 mkdir -p $tempdir $bindir
+
+echo ${GREEN}"===== Updating system"${RESET}
+aptx update && aptx full-upgrade && aptx autoremove
+
+if ([ $_arg_init == 'on' ]); then install_prerequisites; fi
+
 for section in ${!settings[@]}; do
   declare -A config="(${settings[${section}]})"
   app=${config["name"]}
