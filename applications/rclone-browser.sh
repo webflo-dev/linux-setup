@@ -1,19 +1,20 @@
 #!/bin/bash
 
-declare asset_name=$(curl -ssL https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest \
-    | grep "name.*linux-x86_64\.AppImage" \
-    | cut -d '"' -f 4);
+declare asset_name=$(curl -ssL https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest |
+    grep "name.*linux-x86_64\.AppImage" |
+    cut -d '"' -f 4)
 
-if [ -d $asset_name]; then
+if [ -d $asset_name ]; then
     error "⚠ Rclone-browser cannot be downloaded..."
-    exit -1;
+    exit -1
 fi
 
-declare target=$bindir/$asset_name;
+declare target=$bindir/$asset_name
 
-url=$(curl -s https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest \
-| grep "browser_download_url.*linux-x86_64" \
-| cut -d '"' -f 4);
+url=$(curl -s https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest |
+    grep "browser_download_url.*linux-x86_64" |
+    cut -d '"' -f 4)
 
-downloaded_file $url $target;
-chmod +x $target;
+download_file $url $asset_name
+mv $tempdir/$asset_name $target
+chmod +x $target

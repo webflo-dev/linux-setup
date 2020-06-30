@@ -1,10 +1,9 @@
 #!/bin/bash
 
-declare tmp_file=$tempdir/jkjhkghrkghegkhj-omz.sh; 
+declare tmp_file=$tempdir/oh-my-zsh_$(date +%s).sh
 
-wget -O $tmp_file  https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh;
-ZSH=~/.oh-my-zsh RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh $tmp_file;
-rm $tmp_file;
+wget -O $tmp_file https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+ZSH=~/.oh-my-zsh RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh $tmp_file
 
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
