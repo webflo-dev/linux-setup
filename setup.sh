@@ -2,7 +2,6 @@
 
 version=1.0.0
 _arg_app=
-_arg_silent="off"
 _arg_init="on"
 
 ### Command line functions
@@ -11,10 +10,9 @@ print_version() {
 }
 
 print_help() {
-  printf 'Usage: %s [--no-init] [-a|--app <name>] [--silent] [--version]  [-h|--help]\n' "$0"
+  printf 'Usage: %s [--no-init] [-a|--app <name>] [--version]  [-h|--help]\n' "$0"
   printf '\t%s\n' "--no-init: do not run prerequisite install"
   printf '\t%s\n' "-a, --app: Specifiy app to install"
-  printf '\t%s\n' "--silent: Activating silent mode"
   printf '\t%s\n' "--version: Prints version"
   printf '\t%s\n' "-h, --help: Prints help"
 }
@@ -49,9 +47,6 @@ parse_commandline() {
     --version)
       print_version
       exit 0
-      ;;
-    --silent)
-      _arg_silent="on"
       ;;
     --no-init)
       _arg_init="off"
