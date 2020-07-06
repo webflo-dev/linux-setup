@@ -172,11 +172,19 @@ install_apt() {
   aptx install $app
 }
 
+install_script() {
+  local app=$1
+  local url=$2
+  local file=$app-$(date +%s).sh
+  download_file $url $file
+  bash $tempdir/$file
+}
+
 setup_color
 parse_commandline "$@"
 
 declare -A settings
-parse_ini ./setup.ini settings $_arg_app
+parse_ini ./setup2.ini settings $_arg_app
 
 declare workdir=$(pwd)
 declare tempdir=$workdir/temporary_files
@@ -206,6 +214,9 @@ for section in ${!settings[@]}; do
     ;;
   'apt')
     install_apt $app ${config["ppa"]} ${config["key"]} ${config["url"]} ${config["distrib"]} ${config["component"]}
+    ;;
+  'script')
+    install_script $app ${config["url"]}
     ;;
   'custom')
     source $appsdir/$app.sh
