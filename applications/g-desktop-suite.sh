@@ -1,11 +1,11 @@
 #!/bin/bash
 
-declare tmp_file=$tempdir/G-Desktop-Suite.deb;
+declare repo=alexkim205/G-Desktop-Suite
+declare version=$(get_latest_release_github $repo)
+declare file=G-Desktop-Suite-"${version:1}".deb
 
-declare url=$(curl -s https://api.github.com/repos/alexkim205/G-Desktop-Suite/releases/latest \
-| grep "browser_download_url.*deb" \
-| cut -d '"' -f 4); 
+download_file \
+    https://github.com/$repo/releases/download/$version/$file \
+    $file
 
-download_file $url $tmp_file
-aptx install $tmp_file;
-rm $tmp_file;
+aptx install $tempdir/$file

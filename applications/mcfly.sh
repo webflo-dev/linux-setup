@@ -3,7 +3,6 @@
 declare repo=cantino/mcfly
 declare version=$(get_latest_release_github $repo)
 declare file=mcfly-$version-x86_64-unknown-linux-gnu.tar.gz
-declare url=
 declare tmp_dir=$tempdir/mcfly
 
 download_file \
