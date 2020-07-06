@@ -14,5 +14,5 @@ mkdir -p \
     $homedir/.zsh
 
 tar xvf $tempdir/$file -C $tmp_dir
-cp $tmp_dir/mcfly $bindir
-cp $tmp_dir/mcfly.zsh $homedir/.zsh/mcfly.zsh
+cp -f $tmp_dir/mcfly $bindir
+cp -f $tmp_dir/mcfly.zsh $homedir/.zsh/mcfly.zsh
