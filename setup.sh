@@ -137,6 +137,7 @@ install_prerequisites() {
     software-properties-common \
     curl \
     wget \
+    git \
     ca-certificates \
     gnupg-agent \
     ;
@@ -181,9 +182,9 @@ install_script() {
 }
 
 get_latest_release_github() {
-  curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
-    grep '"tag_name":' |                                            # Get tag line
-    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+  curl --silent "https://api.github.com/repos/$1/releases/latest" |
+    grep '"tag_name":' |
+    sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 setup_color
