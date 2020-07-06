@@ -180,11 +180,17 @@ install_script() {
   bash $tempdir/$file
 }
 
+get_latest_release_github() {
+  curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
+    grep '"tag_name":' |                                            # Get tag line
+    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+}
+
 setup_color
 parse_commandline "$@"
 
 declare -A settings
-parse_ini ./setup2.ini settings $_arg_app
+parse_ini ./setup.ini settings $_arg_app
 
 declare workdir=$(pwd)
 declare tempdir=$workdir/temporary_files
