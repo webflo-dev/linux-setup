@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 _git() {
     git -C $homedir $@

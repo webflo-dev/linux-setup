@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare appImageName=appimaged-x86_64.AppImage
 declare target=$tempdir/$appImageName

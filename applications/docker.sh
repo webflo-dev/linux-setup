@@ -1,4 +1,17 @@
-#!/bin/bash
+#!/bin/zsh
+
+aptx remove \
+    docker \
+    docker-engine \
+    docker.io \
+    containerd runc
+
+aptx install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
 
 add_apt_key "docker" \
     "https://download.docker.com/linux/ubuntu/gpg" \
@@ -9,7 +22,6 @@ add_apt_key "docker" \
 apt-key fingerprint 0EBFCD88
 
 aptx update
-aptx remove docker docker-engine docker.io
 aptx install docker-ce docker-ce-cli containerd.io
 
 groupadd docker

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare asset_name=$(curl -ssL https://api.github.com/repos/kapitainsky/RcloneBrowser/releases/latest |
     grep "name.*linux-x86_64\.AppImage" |

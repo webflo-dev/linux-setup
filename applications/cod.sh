@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare repo=dim-an/cod
 declare version=$(get_latest_release_github $repo)

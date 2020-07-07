@@ -1,245 +1,240 @@
-#!/bin/bash
+#!/bin/zsh
 
 version=1.0.0
-_arg_app=
-_arg_init="on"
 
-### Command line functions
-print_version() {
-  printf '%s\n' "Linux-setup version $version"
-}
+autoload -Uz colors
+colors
 
-print_help() {
-  printf 'Usage: %s [--no-init] [-a|--app <name>] [--version]  [-h|--help]\n' "$0"
-  printf '\t%s\n' "--no-init: do not run prerequisite install"
-  printf '\t%s\n' "-a, --app: Specifiy app to install"
-  printf '\t%s\n' "--version: Prints version"
-  printf '\t%s\n' "-h, --help: Prints help"
-}
+zparseopts -D -F - a+:=_arg_app -app+:=_arg_app h=_arg_help -help=_arg_help || exit 1
 
-die() {
-  local _ret=$2
-  test -n "$_ret" || _ret=1
-  test "$_PRINT_HELP" = yes && print_help >&2
-  echo "$1" >&2
-  exit ${_ret}
-}
+_arg_app=${_arg_app[-1]}
+_arg_help=${#_arg_help}
 
-begins_with_short_option() {
-  local first_option all_short_options='ah'
-  first_option="${1:0:1}"
-  test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
-}
+if [[ $_arg_help == 1 ]]; then
+    cat <<EOF
+Linux-setup (v${version})
 
-parse_commandline() {
+Usage: $(basename $0) [OPTIONS]
 
-  while test $# -gt 0; do
-    _key="$1"
-    case "$_key" in
-    -a | --app)
-      test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-      _arg_app="$2"
-      shift
-      ;;
-    --app=*)
-      _arg_app="${_key##--app=}"
-      ;;
-    --version)
-      print_version
-      exit 0
-      ;;
-    --no-init)
-      _arg_init="off"
-      ;;
-    -h | --help)
-      print_help
-      exit 0
-      ;;
-    -h*)
-      print_help
-      exit 0
-      ;;
-    *)
-      _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
-      ;;
-    esac
-    shift
-  done
-
-}
-
-### Parse INI files
-parse_ini() {
-  [[ -f $1 ]] || {
-    echo "$1 is not a file." >&2
-    return 1
-  }
-  if [[ -n $2 ]]; then
-    local -n ini_settings=$2
-  else
-    echo "array is required as second parameter" >&2
-    return 1
-  fi
-  declare -Ag ${!ini_settings} || return 1
-
-  if ([ ! -z "$3" ]); then
-    sections=($3)
-  else
-    sections=$(sed -n 's/^[ \t]*\[\(.*\)\].*/\1/p' $1)
-  fi
-
-  for section in ${sections[@]}; do
-    ini_settings[$section]=$(sed -n "/^[ \t]*\[$section\]/,/\[/s/^[ \t]*\([^#; \t][^ \t=]*\).*=[ \t]*\(.*\)/[\1]=\2/p" $1)
-  done
-}
-
-### Helpers functions
-setup_color() {
-  # Only use colors if connected to a terminal
-  if [ -t 1 ]; then
-    RED=$(printf '\033[31m')
-    GREEN=$(printf '\033[32m')
-    YELLOW=$(printf '\033[33m')
-    BLUE=$(printf '\033[34m')
-    BOLD=$(printf '\033[1m')
-    RESET=$(printf '\033[m')
-  else
-    RED=""
-    GREEN=""
-    YELLOW=""
-    BLUE=""
-    BOLD=""
-    RESET=""
-  fi
-}
-
-aptx() {
-  apt -y -qq $@
-}
-
-add_apt_key() {
-  curl -sSL $2 | apt-key add -
-  echo "deb [arch=amd64] $3 $4 $5" | tee /etc/apt/sources.list.d/$1.list
-}
-
-add_apt_repository() {
-  add-apt-repository $1
-}
-
-download_file() {
-  curl -sSL $1 -o $tempdir/$2
-}
-
-install_prerequisites() {
-  echo ${GREEN}"===== Installing prerequisite"${RESET}
-  aptx install \
-    apt-transport-https \
-    software-properties-common \
-    curl \
-    wget \
-    git \
-    ca-certificates \
-    gnupg-agent \
-    ;
-}
-
-install_deb() {
-  local app=$1
-  local url=$2
-  if [ -z $url ]; then
-    echo "url is missing"
-  else
-    file="$app.deb"
-    download_file $url $file
-    aptx install $tempdir/$file
-    rm $tempdir/$file
-  fi
-}
-
-install_apt() {
-  local app=$1
-  local ppa=$2
-  local key=$3
-  local url=$4
-  local distrib=$5
-  local component=$6
-  if [ ! -z $ppa ]; then
-    add_apt_repository $ppa
-    aptx update
-  elif [ ! -z $key ]; then
-    add_apt_key $app $key $url $distrib $component
-    aptx update
-  fi
-  aptx install $app
-}
-
-install_script() {
-  local app=$1
-  local url=$2
-  local file=$app-$(date +%s).sh
-  download_file $url $file
-  bash $tempdir/$file
-}
-
-get_latest_release_github() {
-  curl --silent "https://api.github.com/repos/$1/releases/latest" |
-    grep '"tag_name":' |
-    sed -E 's/.*"([^"]+)".*/\1/'
-}
-
-setup_color
-parse_commandline "$@"
-
-declare -A settings
-parse_ini ./setup.ini settings $_arg_app
+Options:
+  -a, --a       application to install
+  -h, --help    prints help
+EOF
+    exit 0
+fi
 
 declare workdir=$(pwd)
+declare appsdir=$workdir/applications
+
+if [ -z $_arg_app ]; then
+    if [ ! -f $appsdir/$_arg_app.sh ]; then
+        cat <<EOF
+Application not found: $_arg_app
+Use completion to see avalaible applications.
+EOF
+        exit 0
+    fi
+fi
+
 declare tempdir=$workdir/temporary_files
 declare stepdir=$workdir/steps
 declare homedir=/home/florent
-declare appsdir=$workdir/applications
 declare bindir=$homedir/bin
+declare spinnerfile=$workdir/tmp.log
+declare logfile=$workdir/setup.log
+
+### Helpers functions
+
+aptx() {
+    apt -y -qq $@
+}
+
+add_apt_key() {
+    curl -sSL $2 | apt-key add -
+    echo "deb [arch=amd64] $3 $4 $5" | tee /etc/apt/sources.list.d/$1.list
+}
+
+add_apt_repository() {
+    add-apt-repository $1
+}
+
+download_file() {
+    curl -sSL $1 -o $tempdir/$2
+}
+
+install_deb() {
+    local app=$1
+    local url=$2
+    if [ -z $url ]; then
+        echo "url is missing"
+    else
+        file="$app.deb"
+        download_file $url $file
+        aptx install $tempdir/$file
+        rm $tempdir/$file
+    fi
+}
+
+install_apt() {
+    local app=$1
+    local ppa=$2
+    local key=$3
+    local url=$4
+    local distrib=$5
+    local component=$6
+    if [ ! -z $ppa ]; then
+        add_apt_repository $ppa
+        aptx update
+    elif [ ! -z $key ]; then
+        add_apt_key $app $key $url $distrib $component
+        aptx update
+    fi
+    aptx install $app
+}
+
+install_script() {
+    local app=$1
+    local url=$2
+    local file=$app-$(date +%s).sh
+    download_file $url $file
+    bash $tempdir/$file
+}
+
+get_latest_release_github() {
+    curl --silent "https://api.github.com/repos/$1/releases/latest" |
+        grep '"tag_name":' |
+        sed -E 's/.*"([^"]+)".*/\1/'
+}
+
+spin() {
+    local \
+        before_msg="$1" \
+        after_msg="$2"
+    local spinner
+    local -a spinners
+    spinners=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+    # hide cursor
+    tput civis
+
+    while true; do
+        for spinner in "${spinners[@]}"; do
+            if [[ -f $spinnerfile ]]; then
+                rm -f $spinnerfile
+                tput cnorm
+                return 1
+            fi
+            sleep 0.05
+            printf " $fg[white]$spinner$reset_color  $before_msg\r" 2>/dev/null
+        done
+        [ $#jobstates = 0 ] && break
+    done
+
+    if [[ -n $after_msg ]]; then
+        printf "\033[2K"
+        printf " $fg_bold[blue]\U2714$reset_color  $after_msg\n"
+    fi 2>/dev/null
+
+    # show cursor
+    tput cnorm || true
+}
+
+execute() {
+    local arg title error
+    local -a args errors
+
+    while (($# > 0)); do
+        case "$1" in
+        --title)
+            title="$2"
+            shift
+            ;;
+        --error)
+            errors+=("$2")
+            shift
+            ;;
+        -* | --*)
+            return 1
+            ;;
+        *)
+            args+=("$1")
+            ;;
+        esac
+        shift
+    done
+
+    {
+        for arg in "${args[@]}"; do
+            ${~${=arg}} &>>$logfile
+            # When an error causes
+            if [[ $status -ne 0 ]]; then
+                # error mssages
+                printf "\033[2K" 2>/dev/null
+                printf \
+                    " $fg[yellow]\U26A0$reset_color  $title [$fg[red]FAILED$reset_color]\n" \
+                    2>/dev/null
+                printf "$status\n" >"$spinnerfile"
+                # additional error messages
+                if (($#errors > 0)); then
+                    for error in "${errors[@]}"; do
+                        printf "    -> $error\n" 2>/dev/null
+                    done
+                fi
+            fi
+        done
+    } &
+
+    spin \
+        "$title" \
+        "$title [$fg[green]SUCCEEDED$reset_color]"
+
+    if [[ $status -ne 0 ]]; then
+        printf "\033[2K" 2>/dev/null
+        printf "Oops \U2620 ... Try again!\n" 2>/dev/null
+        exit 1
+    fi
+}
+
+execute_app() {
+    local app=$1
+    execute \
+        --title "$(basename ${app%.*})" \
+        "source $app"
+}
+
+traperr() {
+    tput cnorm
+}
+trap traperr ERR
 
 mkdir -p $tempdir $bindir
+echo >$logfile
 
-echo ${GREEN}"===== Updating system"${RESET}
-aptx update && aptx full-upgrade && aptx autoremove
+clear
 
-if ([ $_arg_init == 'on' ]); then install_prerequisites; fi
+cat <<EOF
+    
+    $fg[cyan]Linux setup$reset_color \U1f4e6
 
-for section in ${!settings[@]}; do
-  declare -A config="(${settings[${section}]})"
-  app=${config["name"]}
-  type=${config["type"]}
-  [ -z "$app" ] && app=$section
+EOF
 
-  echo "${BLUE}Installing: $app${RESET}"
+execute \
+    --title "Installing prerequisites" \
+    "aptx install curl wget git"
 
-  case $type in
-  'deb')
-    install_deb $app ${config["url"]}
-    ;;
-  'apt')
-    install_apt $app ${config["ppa"]} ${config["key"]} ${config["url"]} ${config["distrib"]} ${config["component"]}
-    ;;
-  'script')
-    install_script $app ${config["url"]}
-    ;;
-  'custom')
-    source $appsdir/$app.sh
-    ;;
-  *)
-    echo "Application type not supported: "$type
-    ;;
-  esac
-done
-
-echo ${GREEN}"===== Cleaning up temp files"${RESET}
-rm -rf $tempdir
-
-if [ ! -z /bin/zsh ] && [ -z $_arg_app ]; then
-  echo ${GREEN}"===== Changing shell to ZSH"${RESET}
-  chsh -s /bin/zsh
+if [[ ! -z "$_arg_app" ]]; then
+    execute_app $appsdir/$_arg_app.sh
+else
+    for app in $appsdir/!(_*).sh; do
+        execute_app $app
+    done
 fi
 
-echo ${YELLOW}"Done ! Please close your terminal for updating shell"${RESET}
+execute --title "Cleaning-up" "rm -rf $tempdir $logfile"
+
+cat <<EOF
+
+    ${fg[yellow]}Done !$reset_color 
+    please update your shell by closing up your terminal
+EOF
+printf '%s' $_heredoc

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare repo=alexkim205/G-Desktop-Suite
 declare version=$(get_latest_release_github $repo)

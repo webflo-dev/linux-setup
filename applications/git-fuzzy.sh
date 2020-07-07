@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare target=$bindir/git-fuzzy-repo
 
