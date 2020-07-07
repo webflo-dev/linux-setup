@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare hdir=${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/h
 

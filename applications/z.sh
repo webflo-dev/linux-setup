@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare repo=rupa/z
 declare version=$(get_latest_release_github $repo)

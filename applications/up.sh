@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare updir=$homedir/.zsh
 mkdir -p $updir

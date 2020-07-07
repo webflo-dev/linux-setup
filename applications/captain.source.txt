@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 if [[ ! -z $CAPTAIN_ROOT ]]; then
   cd $CAPTAIN_ROOT;

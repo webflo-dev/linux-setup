@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 declare tmp_file=$tempdir/oh-my-zsh_$(date +%s).sh
 

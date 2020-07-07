@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/bin/zsh
 
-declare gpg=$homedir/florent.gpg;
+aptx install kleopatra
+
+declare gpg=$homedir/florent.gpg
 
 if [ -d $gpg ]; then
-    kleopatra -i $gpg;
+    kleopatra -i $gpg
 fi
