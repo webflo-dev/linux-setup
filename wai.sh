@@ -5,32 +5,37 @@ version=1.0.0
 autoload -Uz colors
 colors
 
-zparseopts -D -F - a+:=_arg_app -app+:=_arg_app h=_arg_help -help=_arg_help || exit 1
+zparseopts -D -F -E - \
+    -all=_arg_all \
+    s+:=_arg_script -script+:=_arg_script \
+    h=_arg_help -help=_arg_help || exit 1
 
-_arg_app=${_arg_app[-1]}
+_arg_all=${#_arg_all}
+_arg_script=${_arg_script[-1]}
 _arg_help=${#_arg_help}
 
-if [[ $_arg_help == 1 ]]; then
+if [[ $_arg_help == 1 || ($_arg_all == 0  && -z $_arg_script) ]]; then
     cat <<EOF
-Linux-setup (v${version})
+webflo apps installer (v${version})
 
 Usage: $(basename $0) [OPTIONS]
 
 Options:
-  -a, --a       application to install
-  -h, --help    prints help
+  --all         install all applications (not working if -s is specified)
+  --script  -s  application to install
+  --help    -h  prints help
 EOF
     exit 0
 fi
 
-declare workdir=$(pwd)
-declare appsdir=$workdir/applications
 
-if [ -z $_arg_app ]; then
-    if [ ! -f $appsdir/$_arg_app.sh ]; then
+declare workdir=${WEBFLO_HOME:-$HOME/.webflo}
+declare appsdir=${WEBFLO_WAI_DIR:-$workdir/apps}
+
+if [ ! -z $_arg_script ]; then
+    if [ ! -f $appsdir/$_arg_script.sh ]; then
         cat <<EOF
-Application not found: $_arg_app
-Use completion to see avalaible applications.
+Script $fg[red]$_arg_script$reset_color not found
 EOF
         exit 0
     fi
@@ -38,10 +43,11 @@ fi
 
 declare tempdir=$workdir/temporary_files
 declare stepdir=$workdir/steps
-declare homedir=/home/florent
+declare homedir=${HOME:-/home/florent}
 declare bindir=$homedir/bin
-declare spinnerfile=$workdir/tmp.log
-declare logfile=$workdir/setup.log
+declare spinnerfile=$workdir/spinner.log
+declare logfile=$workdir/wai.log
+
 
 ### Helpers functions
 
@@ -165,7 +171,7 @@ execute() {
 
     {
         for arg in "${args[@]}"; do
-            ${~${=arg}} &>>$logfile
+            #${~${=arg}} &>>$logfile
             # When an error causes
             if [[ $status -ne 0 ]]; then
                 # error mssages
@@ -207,14 +213,12 @@ traperr() {
 }
 trap traperr ERR
 
-mkdir -p $tempdir $bindir
+mkdir -p $workdir $appsdir $tempdir $bindir
 echo >$logfile
-
-clear
 
 cat <<EOF
     
-    $fg[cyan]Linux setup$reset_color \U1f4e6
+    $fg[cyan]WAI$reset_color (webflo apps installer) \U1f4e6
 
 EOF
 
@@ -222,10 +226,12 @@ execute \
     --title "Installing prerequisites" \
     "aptx install curl wget git"
 
-if [[ ! -z "$_arg_app" ]]; then
-    execute_app $appsdir/$_arg_app.sh
-else
-    for app in $appsdir/!(_*).sh; do
+if [[ ! -z "$_arg_script" ]]; then
+    execute_app $appsdir/$_arg_script.sh
+else if [[ $_arg_all == 1 ]]
+    setopt null_glob
+    setopt extended_glob
+    for app in $appsdir/!(_*).sh(N); do
         execute_app $app
     done
 fi
