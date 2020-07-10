@@ -1,9 +1,12 @@
 #!/bin/zsh
 
-declare tmp_file=$tempdir/oh-my-zsh_$(date +%s).sh
+declare tmp_file=oh-my-zsh_$(date +%s).sh
 
-wget -O $tmp_file https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-ZSH=~/.oh-my-zsh RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh $tmp_file
+download_file \
+    "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh" \
+    $tmp_file
+
+ZSH=~/.oh-my-zsh RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh $tempdir/$tmp_file
 
 declare zdir=${ZSH_CUSTOM:=~/.oh-my-zsh/custom}
 

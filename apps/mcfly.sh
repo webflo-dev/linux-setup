@@ -11,8 +11,8 @@ download_file \
 
 mkdir -p \
     $tmp_dir \
-    $homedir/.zsh
+    $zshdir
 
 tar xvf $tempdir/$file -C $tmp_dir
 cp -f $tmp_dir/mcfly $bindir
-cp -f $tmp_dir/mcfly.zsh $homedir/.zsh/mcfly.zsh
+cp -f $tmp_dir/mcfly.zsh $zshdir/mcfly.zsh

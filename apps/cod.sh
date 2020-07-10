@@ -11,9 +11,9 @@ download_file \
 
 mkdir -p \
     $tmp_dir \
-    $homedir/.zsh
+    $zshdir
 
 tar xvf $tempdir/$file -C $tmp_dir --strip-components=1
 cp -f $tmp_dir/cod $bindir
 
-$bindir/cod init $$ zsh >$homedir/.zsh/cod.zsh
+$bindir/cod init $$ zsh >$zshdir/cod.zsh

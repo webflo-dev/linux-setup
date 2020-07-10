@@ -10,4 +10,4 @@ download_file \
 
 aptx install $tempdir/$file
 
-cat $appsdir/delta.config.txt >>$homedir/.gitconfig
+cat $appsdir/delta.config.txt >>$HOME/.gitconfig

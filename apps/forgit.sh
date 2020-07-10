@@ -1,4 +1,6 @@
 #!/bin/zsh
 
-curl -sSL https://raw.githubusercontent.com/wfxr/forgit/master/forgit.plugin.zsh \
-    -o $homedir/.zsh/forgit.plugin.zsh
+download_file \
+    "https://raw.githubusercontent.com/wfxr/forgit/master/forgit.plugin.zsh" \
+    $zshdir/forgit.plugin.zsh \
+    "no-temp"
