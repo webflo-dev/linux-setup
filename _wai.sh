@@ -14,9 +14,11 @@ _wai() {
 
     case "${words[CURRENT - 1]}" in
     -s | --script)
+        _values -C "toto" "blabla" "plouf"
         local IFS=$'\n'
-        workdir=${WEBFLO_HOME:-$HOME/.webflo}
-        appsdir=${WEBFLO_WAI_DIR:-$workdir/apps}
+        WEBFLO_DIR=${WEBFLO_DIR:-$HOME/.webflo}
+        WAI_DIR=$WEBFLO_DIR/wai
+        appsdir=$WAI_DIR/apps
         if [ -d $appsdir ]; then
             _values -C "scripts" ${$(find $appsdir -type f -iname "[^_*]*.sh" | sed -e "s#${appsdir}/\{0,1\}##" -e 's#\.sh##' -e 's#\\#\\\\#' | sort -V):-""}
         fi
@@ -24,5 +26,4 @@ _wai() {
     esac
 }
 
-compdef _wai wai.sh
 compdef _wai wai

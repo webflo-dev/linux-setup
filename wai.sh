@@ -16,7 +16,7 @@ _arg_help=${#_arg_help}
 
 if [[ $_arg_help == 1 || ($_arg_all == 0  && -z $_arg_script) ]]; then
     cat <<EOF
-webflo apps installer (v${version})
+Webflo Apps Installer (v${version})
 
 Usage: $(basename $0) [OPTIONS]
 
@@ -29,8 +29,7 @@ EOF
 fi
 
 
-declare workdir=${WEBFLO_HOME:-$HOME/.webflo}
-declare appsdir=${WEBFLO_WAI_DIR:-$workdir/apps}
+declare appsdir=${WEBFLO_DIR:-$HOME/.webflo}/wai/apps
 
 if [ ! -z $_arg_script ]; then
     if [ ! -f $appsdir/$_arg_script.sh ]; then
@@ -41,12 +40,11 @@ EOF
     fi
 fi
 
-declare tempdir=$workdir/temporary_files
-declare stepdir=$workdir/steps
-declare homedir=${HOME:-/home/florent}
-declare bindir=$homedir/bin
-declare spinnerfile=$workdir/spinner.log
-declare logfile=$workdir/wai.log
+declare bindir=$HOME/bin
+declare zshdir=$HOME/.zsh
+declare tempdir=/tmp/wai-files-$(date +%s)
+declare spinnerfile=/tmp/wai-spinner-$(date +%s).log
+declare logfile=/tmp/wai-$(date +%s).log
 
 
 ### Helpers functions
@@ -65,7 +63,11 @@ add_apt_repository() {
 }
 
 download_file() {
-    curl -sSL $1 -o $tempdir/$2
+    if [[ $3 == "no-temp" ]]; then
+        curl -sSL $1 -o $2
+    else
+        curl -sSL $1 -o $tempdir/$2
+    fi
 }
 
 install_deb() {
@@ -103,7 +105,7 @@ install_script() {
     local url=$2
     local file=$app-$(date +%s).sh
     download_file $url $file
-    bash $tempdir/$file
+    zsh $tempdir/$file
 }
 
 get_latest_release_github() {
@@ -114,8 +116,9 @@ get_latest_release_github() {
 
 spin() {
     local \
-        before_msg="$1" \
-        after_msg="$2"
+        pid=$1 \
+        before_msg="$2" \
+        after_msg="$3"
     local spinner
     local -a spinners
     spinners=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
@@ -123,7 +126,7 @@ spin() {
     # hide cursor
     tput civis
 
-    while true; do
+    while kill -0 $pid 2>/dev/null; do
         for spinner in "${spinners[@]}"; do
             if [[ -f $spinnerfile ]]; then
                 rm -f $spinnerfile
@@ -133,7 +136,6 @@ spin() {
             sleep 0.05
             printf " $fg[white]$spinner$reset_color  $before_msg\r" 2>/dev/null
         done
-        [ $#jobstates = 0 ] && break
     done
 
     if [[ -n $after_msg ]]; then
@@ -146,8 +148,8 @@ spin() {
 }
 
 execute() {
-    local arg title error
-    local -a args errors
+    local args arg title error
+    local -a errors
 
     while (($# > 0)); do
         case "$1" in
@@ -163,7 +165,7 @@ execute() {
             return 1
             ;;
         *)
-            args+=("$1")
+            args="$1"
             ;;
         esac
         shift
@@ -171,19 +173,20 @@ execute() {
 
     {
         for arg in "${args[@]}"; do
-            #${~${=arg}} &>>$logfile
+            ${~${=arg}} &>>/dev/null
+            exitCode=$?
             # When an error causes
-            if [[ $status -ne 0 ]]; then
+            if [[ $exitCode -ne 0 ]]; then
                 # error mssages
                 printf "\033[2K" 2>/dev/null
                 printf \
-                    " $fg[yellow]\U26A0$reset_color  $title [$fg[red]FAILED$reset_color]\n" \
+                    "  $fg[yellow]\U26A0$reset_color  $title [$fg[red]FAILED$reset_color]\n" \
                     2>/dev/null
-                printf "$status\n" >"$spinnerfile"
+                printf "$exitCode\n" >"$spinnerfile"
                 # additional error messages
                 if (($#errors > 0)); then
                     for error in "${errors[@]}"; do
-                        printf "    -> $error\n" 2>/dev/null
+                        printf "     \U1f816 $error\n" 2>/dev/null
                     done
                 fi
             fi
@@ -191,12 +194,13 @@ execute() {
     } &
 
     spin \
+        $! \
         "$title" \
         "$title [$fg[green]SUCCEEDED$reset_color]"
 
-    if [[ $status -ne 0 ]]; then
+    if [[ $? -ne 0 ]]; then
         printf "\033[2K" 2>/dev/null
-        printf "Oops \U2620 ... Try again!\n" 2>/dev/null
+        printf "\nOops \U2620 ... Try again!\n" 2>/dev/null
         exit 1
     fi
 }
@@ -208,13 +212,16 @@ execute_app() {
         "source $app"
 }
 
+prerequisites() {
+    aptx install curl git
+}
+
 traperr() {
     tput cnorm
 }
 trap traperr ERR
 
-mkdir -p $workdir $appsdir $tempdir $bindir
-echo >$logfile
+mkdir -p $tempdir $bindir $zshdir
 
 cat <<EOF
     
@@ -224,7 +231,7 @@ EOF
 
 execute \
     --title "Installing prerequisites" \
-    "aptx install curl wget git"
+    "prerequisites"
 
 if [[ ! -z "$_arg_script" ]]; then
     execute_app $appsdir/$_arg_script.sh
@@ -236,11 +243,10 @@ else if [[ $_arg_all == 1 ]]
     done
 fi
 
-execute --title "Cleaning-up" "rm -rf $tempdir $logfile"
+execute --title "Cleaning-up" "rm -rf $tempdir $logfile $spinnerfile"
 
 cat <<EOF
 
     ${fg[yellow]}Done !$reset_color 
     please update your shell by closing up your terminal
 EOF
-printf '%s' $_heredoc

@@ -9,5 +9,4 @@ curl -sSL $url |
     awk '/icaclient_.*_amd64.deb/{print "http:"$0}' |
     wget -O $tmp_file -i -
 
-apt -y -qq install $tmp_file
-rm $tmp_file
+aptx install $tmp_file
