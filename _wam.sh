@@ -1,6 +1,6 @@
-# Completion script for WAI (webflo apps installer)
+# Completion script for WAM (webflo apps manager)
 
-_wai() {
+_wam() {
 
     local curcontext="$curcontext" state line
     integer ret=1
@@ -17,8 +17,8 @@ _wai() {
         _values -C "toto" "blabla" "plouf"
         local IFS=$'\n'
         WEBFLO_DIR=${WEBFLO_DIR:-$HOME/.webflo}
-        WAI_DIR=$WEBFLO_DIR/wai
-        appsdir=$WAI_DIR/apps
+        WAM_DIR=$WEBFLO_DIR/wam
+        appsdir=$WAM_DIR/apps
         if [ -d $appsdir ]; then
             _values -C "scripts" ${$(find $appsdir -type f -iname "[^_*]*.sh" | sed -e "s#${appsdir}/\{0,1\}##" -e 's#\.sh##' -e 's#\\#\\\\#' | sort -V):-""}
         fi
@@ -26,4 +26,4 @@ _wai() {
     esac
 }
 
-compdef _wai wai
+compdef _wam wam

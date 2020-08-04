@@ -4,9 +4,9 @@ autoload -Uz colors
 colors
 
 WEBFLO_DIR=${WEBFLO_DIR:-$HOME/.webflo}
-WAI_DIR=$WEBFLO_DIR/wai
-spinnerfile=/tmp/wai-spinner-$(date +%s).log
-logfile=/tmp/wai-$(date +%s).log
+WAM_DIR=$WEBFLO_DIR/wam
+spinnerfile=/tmp/wam-spinner-$(date +%s).log
+logfile=/tmp/wam-$(date +%s).log
 
 trap_error() {
     tput cnorm
@@ -18,28 +18,28 @@ prerequisites() {
         echo "git not found"
         return 1
     fi
-    if [[ -d $WAI_DIR ]]; then
-        echo "WAI is already installed: $WAI_DIR"
+    if [[ -d $WAM_DIR ]]; then
+        echo "WAM is already installed: $WAM_DIR"
         return 1
     fi
     return 0
 }
 
-setup_wai() {
+setup_wam() {
     local BIN_DIR=$HOME/bin
 
-    git clone https://github.com/webflo-dev/wai.git $WAI_DIR
+    git clone https://github.com/webflo-dev/wam.git $WAM_DIR
     mkdir -p $BIN_DIR
 
-    ln -s $WAI_DIR/wai.sh $BIN_DIR/wai
-    chmod u+x $WAI_DIR/wai.sh
+    ln -s $WAM_DIR/wam.sh $BIN_DIR/wam
+    chmod u+x $WAM_DIR/wam.sh
 
-    # sudo ln -s $WAI_DIR/_wai.sh /usr/local/share/zsh/site-functions/_wai
-    ln -s $WAI_DIR/_wai.sh $HOME/.zsh/wai.zsh
+    # sudo ln -s $WAM_DIR/_wam.sh /usr/local/share/zsh/site-functions/_wam
+    ln -s $WAM_DIR/_wam.sh $HOME/.zsh/wam.zsh
 }
 
 cleanup() {
-    rm -f /tmp/wai-*(N) /tmp/wai-spinner-*(N)
+    rm -f /tmp/wam-*(N) /tmp/wam-spinner-*(N)
 }
 
 spin() {
@@ -135,21 +135,21 @@ execute() {
 
 cat <<EOF
     
- $(printf "\U1F4E6") Installer for $fg_bold[cyan]WAI$reset_color (Webflo Apps Installer) 
+ $(printf "\U1F4E6") Installer for $fg_bold[cyan]WAM$reset_color (Webflo Apps Installer) 
 
 EOF
 
 execute \
     --title "Checking prerequisites" \
-    --error "WAI is maybe already installed " \
+    --error "WAM is maybe already installed " \
     --error "Check if git is installed" \
     "prerequisites"
 
 execute \
-    --title "Installing WAI" \
-    "setup_wai"
+    --title "Installing WAM" \
+    "setup_wam"
 
 cat <<EOF
 
-    $fg_bold[cyan]WAI$reset_color ${fg[yellow]}is now installed!$reset_color 
+    $fg_bold[cyan]WAM$reset_color ${fg[yellow]}is now installed!$reset_color 
 EOF
