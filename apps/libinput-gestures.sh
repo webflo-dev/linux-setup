@@ -1,15 +1,22 @@
 #!/bin/zsh
 
-gpasswd -a $USER input
-aptx install xdotool wmctrl libinput-tools
+libinput-gestures_info() {
+    echo "https://github.com/bulletmark/libinput-gestures"
+}
 
-declare git_dir=$tempdir/libinput-gestures
+libinput-gestures_install() {
 
-git clone https://github.com/bulletmark/libinput-gestures.git $git_dir
+    gpasswd -a $USER input
+    aptx install xdotool wmctrl libinput-tools
 
-cd $git_dir
-./libinput-gestures-setup install
-rm -rf $git_dir
+    declare git_dir=$tempdir/libinput-gestures
 
-sudo -H -u $USER libinput-gestures-setup autostart
-sudo -H -u $USER libinput-gestures-setup start
+    git clone https://github.com/bulletmark/libinput-gestures.git $git_dir
+
+    cd $git_dir
+    ./libinput-gestures-setup install
+    rm -rf $git_dir
+
+    sudo -H -u $USER libinput-gestures-setup autostart
+    sudo -H -u $USER libinput-gestures-setup start
+}

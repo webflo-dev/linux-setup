@@ -1,29 +1,35 @@
 #!/bin/zsh
 
-aptx remove \
-    docker \
-    docker-engine \
-    docker.io \
-    containerd runc
+docker_info() {
+    echo "https://www.docker.com"
+}
 
-aptx install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
+docker_install() {
+    aptx remove \
+        docker \
+        docker-engine \
+        docker.io \
+        containerd runc
 
-add_apt_key "docker" \
-    "https://download.docker.com/linux/ubuntu/gpg" \
-    "https://download.docker.com/linux/ubuntu" \
-    $(lsb_release -cs) \
-    "stable"
+    aptx install \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg-agent \
+        software-properties-common
 
-apt-key fingerprint 0EBFCD88
+    add_apt_key "docker" \
+        "https://download.docker.com/linux/ubuntu/gpg" \
+        "https://download.docker.com/linux/ubuntu" \
+        $(lsb_release -cs) \
+        "stable"
 
-aptx update
-aptx install docker-ce docker-ce-cli containerd.io
+    apt-key fingerprint 0EBFCD88
 
-groupadd docker
-usermod -aG docker $USER
-systemctl enable docker
+    aptx update
+    aptx install docker-ce docker-ce-cli containerd.io
+
+    groupadd docker
+    usermod -aG docker $USER
+    systemctl enable docker
+}

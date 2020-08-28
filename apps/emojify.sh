@@ -1,8 +1,15 @@
 #!/bin/zsh
 
-download_file \
-    "https://raw.githubusercontent.com/mrowa44/emojify/master/emojify" \
-    $bindir/emojify \
-    "no-temp"
+emojify_info() {
+    echo "https://github.com/mrowa44/emojify"
+}
 
-chmod u+x $bindir/emojify
+emojify_install() {
+
+    download_file \
+        "https://raw.githubusercontent.com/mrowa44/emojify/master/emojify" \
+        $bindir/emojify \
+        "no-temp"
+
+    chmod u+x $bindir/emojify
+}

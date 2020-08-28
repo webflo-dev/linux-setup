@@ -1,13 +1,19 @@
 #!/bin/zsh
 
-declare repo=dandavison/delta
-declare version=$(get_latest_release_github $repo)
-declare file="git-delta_"$version"_amd64.deb"
+delta_info() {
+    echo "https://github.com/dandavison/delta"
+}
 
-download_file \
-    https://github.com/$repo/releases/download/$version/$file \
-    $file
+delta_install() {
+    declare repo=dandavison/delta
+    declare version=$(get_latest_release_github $repo)
+    declare file="git-delta_"$version"_amd64.deb"
 
-aptx install $tempdir/$file
+    download_file \
+        https://github.com/$repo/releases/download/$version/$file \
+        $file
 
-cat $appsdir/delta.config.txt >>$HOME/.gitconfig
+    aptx install $tempdir/$file
+
+    cat $appsdir/delta.config.txt >>$HOME/.gitconfig
+}

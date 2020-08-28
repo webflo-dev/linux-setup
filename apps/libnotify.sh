@@ -1,3 +1,5 @@
 #!/bin/zsh
 
-aptx install libnotify-bin
+libnotify_install() {
+    aptx install libnotify-bin
+}

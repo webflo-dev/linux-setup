@@ -1,3 +1,9 @@
 #!/bin/zsh
 
-aptx install fzf
+fzf_info() {
+    echo "https://github.com/junegunn/fzf"
+}
+
+fzf_install() {
+    aptx install fzf
+}

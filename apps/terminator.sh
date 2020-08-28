@@ -1,3 +1,5 @@
 #!/bin/zsh
 
-aptx install terminator
+terminator_install() {
+    aptx install terminator
+}

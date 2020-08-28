@@ -1,10 +1,16 @@
 #!/bin/zsh
 
-declare appImageName=appimaged-x86_64.AppImage
+appimaged_info() {
+    echo "https://github.com/AppImage/appimaged"
+}
 
-download_file \
-    "https://github.com/AppImage/appimaged/releases/download/continuous/$appImageName" \
-    $appImageName
+appimaged_install() {
+    declare appImageName=appimaged-x86_64.AppImage
 
-chmod u+x $tempdir/$appImageName
-sh -c "$tempdir/$appImageName --install"
+    download_file \
+        "https://github.com/AppImage/appimaged/releases/download/continuous/$appImageName" \
+        $appImageName
+
+    chmod u+x $tempdir/$appImageName
+    sh -c "$tempdir/$appImageName --install"
+}

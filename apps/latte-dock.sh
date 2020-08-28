@@ -1,3 +1,5 @@
 #!/bin/zsh
 
-aptx install latte-dock
+latte-dock_install() {
+    aptx install latte-dock
+}

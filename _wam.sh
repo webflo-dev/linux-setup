@@ -26,4 +26,4 @@ _wam() {
     esac
 }
 
-compdef _wam wam
+compdef _wam wam wam.sh
