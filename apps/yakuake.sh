@@ -1,3 +1,5 @@
 #!/bin/zsh
 
-aptx install yakuake
+yakuake_install() {
+    aptx install yakuake
+}

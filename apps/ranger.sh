@@ -1,3 +1,9 @@
 #!/bin/zsh
 
-aptx install ranger
+ranger_info() {
+    echo "https://github.com/ranger/ranger"
+}
+
+ranger_install() {
+    aptx install ranger
+}

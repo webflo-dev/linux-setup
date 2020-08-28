@@ -1,3 +1,9 @@
 #!/bin/zsh
 
-aptx install direnv
+direnv_info() {
+    echo "https://direnv.net"
+}
+
+direnv_install() {
+    aptx install direnv
+}

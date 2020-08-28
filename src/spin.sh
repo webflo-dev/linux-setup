@@ -92,9 +92,3 @@ execute() {
     fi
 }
 
-execute_app() {
-    local app=$1
-    execute \
-        --title "$(basename ${app%.*})" \
-        "source $app"
-}

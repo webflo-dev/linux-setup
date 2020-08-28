@@ -1,11 +1,17 @@
 #!/bin/zsh
 
-declare hdir=${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/h
+h_info() {
+    echo "https://github.com/paoloantinori/hhighlighter"
+}
 
-unalias h
+h_install() {
+    declare hdir=${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/h
 
-# dependencies
-aptx install ack-grep
+    unalias h
 
-git clone https://github.com/paoloantinori/hhighlighter.git $hdir
-mv $hdir/h.sh $hdir/h.plugin.zsh
+    # dependencies
+    aptx install ack-grep
+
+    git clone https://github.com/paoloantinori/hhighlighter.git $hdir
+    mv $hdir/h.sh $hdir/h.plugin.zsh
+}
